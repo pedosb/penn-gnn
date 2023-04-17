@@ -13,7 +13,11 @@ def diffuse_signal(signal: np.ndarray, graph_shift_operator, n_diffusion_steps, 
 
 
 def filter(filter_coefficients, signal, graph_shift_operator):
-    filtered_signal = np.zeros_like(signal)
+    filtered_signal = None
     for shift, coefficient in enumerate(filter_coefficients):
-        filtered_signal += (np.power(graph_shift_operator, shift) @ signal.T).T * coefficient
+        signal_step = ((graph_shift_operator**shift) @ signal.T).T * coefficient
+        if filtered_signal is None:
+            filtered_signal = signal_step
+        else:
+            filtered_signal += signal_step
     return filtered_signal
