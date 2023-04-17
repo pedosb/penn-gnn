@@ -1,8 +1,9 @@
 # %%
-import numpy as np
 import networkx as nx
+import numpy as np
 from sklearn.model_selection import train_test_split
 
+from lab2_graph_oprations import diffuse_signal
 from utils import random
 
 
@@ -32,12 +33,13 @@ def generate_stochastic_block_model_graph(n_nodes, n_communities, size_communiti
     adjacency_matrix /= np.abs(eigenvalues).max()
 
     g = nx.from_numpy_array(adjacency_matrix)
-    nx.draw(g, nx.nx_agraph.graphviz_layout(g))
+    nx.draw(g, nx.nx_agraph.graphviz_layout(g), node_color=[find_community(n) for n in g.nodes])
     return adjacency_matrix
 
 
 # %%
-def generate_source_localization_samples(n_samples, n_sources, source_value_min, source_value_max):
+def generate_source_localization_samples(n_nodes, n_samples, n_sources, source_value_min,
+                                         source_value_max):
     # \calS
     sources = np.concatenate([
         random.choice(n_nodes, n_sources, replace=False).reshape(1, -1) for _ in range(n_samples)
@@ -48,15 +50,6 @@ def generate_source_localization_samples(n_samples, n_sources, source_value_min,
                                    sources.size).reshape(sources.shape)
     signal[sources_idx] = signal_values
     return signal
-
-
-def diffuse_signal(signal: np.ndarray, adjacency_matrix, n_diffusion_steps, noise_mean,
-                   noise_covariance):
-    for _ in range(n_diffusion_steps):
-        noise = random.normal(noise_mean, np.sqrt(noise_covariance), size=(n_samples, n_nodes))
-        diffused_signal = (adjacency_matrix @ signal.T).T + noise
-        signal = diffused_signal
-    return diffused_signal
 
 
 # %%
@@ -76,7 +69,7 @@ def generate_dataset():
     n_sources = 10  # M
     source_value_min = 0  # a
     source_value_max = 10  # b
-    signal = generate_source_localization_samples(n_samples, n_sources, source_value_min,
+    signal = generate_source_localization_samples(n_nodes, n_samples, n_sources, source_value_min,
                                                   source_value_max)
 
     n_diffusion_steps = 4
@@ -99,28 +92,28 @@ generate_dataset()
 
 # %%
 if __name__ == '__main__':
-    n_nodes = 50
-    n_communities = 5
+    n_nodes = 5
+    n_communities = 2
     intra_community_probability = 0.6
     inter_community_probability = 0.2
     size_communities = [n_nodes / n_communities] * n_communities
-    adjacency_matrix = generate_stochastic_block_model_graph(n_nodes, n_communities,
-                                                             size_communities,
-                                                             intra_community_probability,
-                                                             inter_community_probability)
+    graph_shift_operator = generate_stochastic_block_model_graph(n_nodes, n_communities,
+                                                                 size_communities,
+                                                                 intra_community_probability,
+                                                                 inter_community_probability)
 
-    n_nodes = adjacency_matrix.shape[0]
+    n_nodes = graph_shift_operator.shape[0]
     n_samples = 2100
-    n_sources = 10  # M
+    n_sources = 1  # M
     source_value_min = 0  # a
     source_value_max = 10  # b
-    signal = generate_source_localization_samples(n_samples, n_sources, source_value_min,
+    signal = generate_source_localization_samples(n_nodes, n_samples, n_sources, source_value_min,
                                                   source_value_max)
 
     n_diffusion_steps = 4
     noise_mean = 0
     noise_covariance = np.identity(1) * 1e-3
-    diffused_signal = diffuse_signal(signal, adjacency_matrix, n_diffusion_steps, noise_mean,
+    diffused_signal = diffuse_signal(signal, graph_shift_operator, n_diffusion_steps, noise_mean,
                                      noise_covariance)
 
     X_train, X_test, Y_train, Y_test = train_test_split(diffused_signal,
