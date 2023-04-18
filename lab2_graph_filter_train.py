@@ -3,10 +3,9 @@ import torch
 from matplotlib import pyplot as plt
 import numpy as np
 
-from lab2_graph_filter import GraphFilter
+from lab2_graph_filter import GraphFilter, MultiLayerGNN
 from lab2_generation import generate_dataset
 
-# %%
 filter_order = 8
 learning_rate = 5e-2
 n_epochs = 30
@@ -20,7 +19,15 @@ train_size = int(np.floor((1 - validation_ration) * X_train.shape[0]))
 X_train, X_validation = torch.split(X_train, train_size)
 Y_train, Y_validation = torch.split(Y_train, train_size)
 
-filter_model = GraphFilter(filter_order, graph_shift_operator)
+# %%
+TASK = 'multilayer_gnn'
+if TASK == 'graph_filter':
+    filter_model = GraphFilter(filter_order, graph_shift_operator, use_activation=False)
+elif TASK == 'graph_perceptron':
+    filter_model = GraphFilter(filter_order, graph_shift_operator, use_activation=True)
+elif TASK == 'multilayer_gnn':
+    filters_order = [8, 1]
+    filter_model = MultiLayerGNN(filters_order, graph_shift_operator)
 
 optimizer = torch.optim.Adam(filter_model.parameters(), learning_rate)
 loss_function = torch.nn.MSELoss(reduction='mean')
@@ -35,7 +42,7 @@ for epoch in range(n_epochs):
         Y_batch = Y_train[batch_idx]
         predicted = filter_model.forward(X_batch)
         loss = loss_function(Y_batch, predicted)
-        batch_loss_history.append(loss.detach().numpy())
+        batch_loss_history.append((step, loss.detach().numpy()))
         filter_model.zero_grad()
         loss.backward()
         optimizer.step()
@@ -49,7 +56,7 @@ fig = plt.figure()
 ax = fig.add_subplot(1, 1, 1)
 
 # ax.set_yscale('log')
-ax.plot(batch_loss_history, label='Batch loss')
+ax.plot(*np.array(batch_loss_history).T, label='Batch loss')
 ax.plot(*np.array(validation_loss_history).T, label='Validation loss')
 ax.legend()
 
