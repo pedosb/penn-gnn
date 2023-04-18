@@ -3,7 +3,7 @@ import networkx as nx
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-from lab2_graph_oprations import diffuse_signal
+from lab2_graph_operations import diffuse_signal
 from utils import random
 
 
@@ -46,8 +46,7 @@ def generate_source_localization_samples(n_nodes, n_samples, n_sources, source_v
     ])
     signal = np.zeros((n_samples, n_nodes))
     sources_idx = (np.arange(n_samples).reshape(-1, 1), sources)
-    signal_values = random.uniform(source_value_min, source_value_max,
-                                   sources.size).reshape(sources.shape)
+    signal_values = random.uniform(source_value_min, source_value_max, n_samples).reshape(-1, 1)
     signal[sources_idx] = signal_values
     return signal
 
@@ -85,7 +84,7 @@ def generate_dataset():
                                                             np.iinfo(np.int32).max),
                                                         shuffle=True)
 
-    return X_train, X_test, Y_train, Y_test
+    return adjacency_matrix, X_train, X_test, Y_train, Y_test
 
 
 generate_dataset()

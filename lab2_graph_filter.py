@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from lab2_graph_oprations import filter
+from lab2_graph_operations import filter
 
 
 class GraphFilter(nn.Module):
@@ -12,4 +12,4 @@ class GraphFilter(nn.Module):
         self.coefficients = nn.Parameter(torch.rand((order, )))
 
     def forward(self, X):
-        filter(self.coefficients, X, self.graph_shift_operator)
+        return filter(self.coefficients, X, self.graph_shift_operator)
