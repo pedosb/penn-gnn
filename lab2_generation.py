@@ -1,4 +1,5 @@
 # %%
+import torch
 import networkx as nx
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -93,37 +94,7 @@ def generate_dataset():
     return adjacency_matrix, X_train, X_test, Y_train, Y_test
 
 
-generate_dataset()
-
 # %%
 if __name__ == '__main__':
-    n_nodes = 5
-    n_communities = 2
-    intra_community_probability = 0.6
-    inter_community_probability = 0.2
-    size_communities = [n_nodes / n_communities] * n_communities
-    graph_shift_operator = generate_stochastic_block_model_graph(n_nodes, n_communities,
-                                                                 size_communities,
-                                                                 intra_community_probability,
-                                                                 inter_community_probability)
-
-    n_nodes = graph_shift_operator.shape[0]
-    n_samples = 2100
-    n_sources = 1  # M
-    source_value_min = 0  # a
-    source_value_max = 10  # b
-    signal = generate_source_localization_samples(n_nodes, n_samples, n_sources, source_value_min,
-                                                  source_value_max)
-
-    n_diffusion_steps = 4
-    noise_mean = 0
-    noise_covariance = np.identity(1) * 1e-3
-    diffused_signal = diffuse_signal(signal, graph_shift_operator, n_diffusion_steps, noise_mean,
-                                     noise_covariance)
-
-    X_train, X_test, Y_train, Y_test = train_test_split(diffused_signal,
-                                                        signal,
-                                                        test_size=100,
-                                                        random_state=random.integers(
-                                                            np.iinfo(np.int32).max),
-                                                        shuffle=True)
+    torch.save([torch.tensor(v, dtype=torch.float64) for v in generate_dataset()],
+               'lab2_dataset.pt')
