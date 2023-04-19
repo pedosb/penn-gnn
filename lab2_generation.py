@@ -8,9 +8,12 @@ from utils import random
 
 
 # %%
-def generate_stochastic_block_model_graph(n_nodes, n_communities, size_communities,
+def generate_stochastic_block_model_graph(n_nodes,
+                                          n_communities,
+                                          size_communities,
                                           intra_community_probability,
-                                          inter_community_probability):
+                                          inter_community_probability,
+                                          plot_graph=False):
     accumulated_size_communities = np.cumsum(size_communities)
     adjacency_matrix = np.zeros((n_nodes, n_nodes))
 
@@ -32,8 +35,11 @@ def generate_stochastic_block_model_graph(n_nodes, n_communities, size_communiti
     eigenvalues, _ = np.linalg.eig(adjacency_matrix)
     adjacency_matrix /= np.abs(eigenvalues).max()
 
-    g = nx.from_numpy_array(adjacency_matrix)
-    nx.draw(g, nx.nx_agraph.graphviz_layout(g), node_color=[find_community(n) for n in g.nodes])
+    if plot_graph:
+        g = nx.from_numpy_array(adjacency_matrix)
+        nx.draw(g,
+                nx.nx_agraph.graphviz_layout(g),
+                node_color=[find_community(n) for n in g.nodes])
     return adjacency_matrix
 
 
