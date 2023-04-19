@@ -3,6 +3,8 @@ import torch
 from matplotlib import pyplot as plt
 import numpy as np
 
+torch.random.manual_seed(20)
+
 from lab2_graph_filter import GraphFilter, MultiLayerGNN
 from lab2_generation import generate_dataset
 
