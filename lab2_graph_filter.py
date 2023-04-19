@@ -19,7 +19,10 @@ class GraphFilter(nn.Module):
         self.graph_shift_operator = graph_shift_operator
         self.coefficients = nn.Parameter(torch.rand((order, )))
         self.reset_parameters()
-        self.use_activation = use_activation
+        if use_activation:
+            self.activation = nn.ReLU()
+        else:
+            self.activation = None
 
     def reset_parameters(self):
         stdv = 1. / math.sqrt(len(self.coefficients))
@@ -27,8 +30,8 @@ class GraphFilter(nn.Module):
 
     def forward(self, X):
         filtered_signal = filter(self.coefficients, X, self.graph_shift_operator)
-        if self.use_activation:
-            return nn.functional.relu(filtered_signal)
+        if self.activation is not None:
+            return self.activation(filtered_signal)
         else:
             return filtered_signal
 
