@@ -5,7 +5,6 @@ import numpy as np
 torch.random.manual_seed(20)
 
 from lab2_graph_filter import GraphFilter, MultiLayerGNN
-from lab2_generation import generate_dataset
 
 filter_order = 8
 learning_rate = 5e-2

@@ -7,6 +7,7 @@ experiments = {
     'Reference perceptron': mainOnlyPerceptron.run,
     'My filter': lambda: lab2_graph_filter_train.run('graph_filter'),
     'My perceptron': lambda: lab2_graph_filter_train.run('graph_perceptron'),
+    'My MLGNN': lambda: lab2_graph_filter_train.run('multilayer_gnn'),
 }
 
 n_experiments = 30
