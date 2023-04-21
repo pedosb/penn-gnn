@@ -39,12 +39,16 @@ def run(task, verbose=False):
         for batch_idx in torch.split(torch.randperm(X_train.shape[0]), batch_size):
             X_batch = X_train[batch_idx]
             Y_batch = Y_train[batch_idx]
+
             predicted = filter_model.forward(X_batch)
             loss = loss_function(Y_batch, predicted)
-            batch_loss_history.append((step, loss.detach().numpy()))
-            filter_model.zero_grad()
+
+            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+
+            batch_loss_history.append((step, loss.detach().numpy()))
+
             step += 1
         with torch.no_grad():
             predicted = filter_model.forward(X_validation)
