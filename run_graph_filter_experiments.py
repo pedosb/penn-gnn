@@ -36,6 +36,9 @@ experiments = {
     'My linear': {
         'task': 'linear'
     },
+    'My FCNN': {
+        'task': 'fcnn'
+    },
 }
 
 n_experiments = 1
