@@ -19,7 +19,7 @@ X_train, X_validation = torch.split(X_train, train_size)
 Y_train, Y_validation = torch.split(Y_train, train_size)
 
 
-def run(task, verbose=False):
+def run(task, verbose=False, save_fig=False):
     if task == 'graph_filter':
         filter_model = GraphFilter(filter_order, graph_shift_operator, 1, 1, use_activation=False)
     elif task == 'graph_perceptron':
@@ -36,9 +36,17 @@ def run(task, verbose=False):
                                      banks_order,
                                      graph_shift_operator,
                                      use_activation=False)
-    elif task == 'multi_feature_two_layer_gnn':
+    elif task == 'multi_feature_two_layers_gnn':
         banks_order = [8, 1]
         n_filters_per_bank = [32, 1]
+        filter_model = MultiLayerGNN(1,
+                                     n_filters_per_bank,
+                                     banks_order,
+                                     graph_shift_operator,
+                                     use_activation=True)
+    elif task == 'multi_feature_three_layers_gnn':
+        banks_order = [5, 5, 1]
+        n_filters_per_bank = [16, 4, 1]
         filter_model = MultiLayerGNN(1,
                                      n_filters_per_bank,
                                      banks_order,
@@ -70,7 +78,7 @@ def run(task, verbose=False):
             predicted = filter_model.forward(X_validation).squeeze()
             validation_loss_history.append((step, loss_function(Y_validation, predicted).numpy()))
 
-    if verbose:
+    if save_fig or verbose:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
 
@@ -78,6 +86,14 @@ def run(task, verbose=False):
         ax.plot(*np.array(batch_loss_history).T, label='Batch loss')
         ax.plot(*np.array(validation_loss_history).T, label='Validation loss')
         ax.legend()
+
+        if save_fig:
+            fig.savefig(f'figures/{task}.png')
+
+        if verbose:
+            plt.show()
+
+        plt.close()
 
     with torch.no_grad():
         predicted = filter_model.forward(X_test).squeeze()
