@@ -84,6 +84,8 @@ def generate_dataset():
     diffused_signal = diffuse_signal(signal, adjacency_matrix, n_diffusion_steps, noise_mean,
                                      noise_covariance)
 
+    diffused_signal = np.expand_dims(diffused_signal, -1)
+
     X_train, X_test, Y_train, Y_test = train_test_split(diffused_signal,
                                                         signal,
                                                         test_size=100,

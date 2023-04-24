@@ -12,7 +12,7 @@ n_epochs = 30
 batch_size = 200
 validation_ration = 0.1
 
-graph_shift_operator, X_train, X_test, Y_train, Y_test = torch.load('lab2_dataset_reference.pt')
+graph_shift_operator, X_train, X_test, Y_train, Y_test = torch.load('lab2_dataset.pt')
 
 train_size = int(np.floor((1 - validation_ration) * X_train.shape[0]))
 X_train, X_validation = torch.split(X_train, train_size)
@@ -21,12 +21,21 @@ Y_train, Y_validation = torch.split(Y_train, train_size)
 
 def run(task, verbose=False):
     if task == 'graph_filter':
-        filter_model = GraphFilter(filter_order, graph_shift_operator, use_activation=False)
+        filter_model = GraphFilter(filter_order, graph_shift_operator, 1, 1, use_activation=False)
     elif task == 'graph_perceptron':
-        filter_model = GraphFilter(filter_order, graph_shift_operator, use_activation=True)
+        filter_model = GraphFilter(filter_order, graph_shift_operator, 1, 1, use_activation=True)
     elif task == 'multilayer_gnn':
-        filters_order = [8, 1]
-        filter_model = MultiLayerGNN(filters_order, graph_shift_operator)
+        banks_order = [8, 1]
+        n_filters_per_bank = [1, 1]
+        filter_model = MultiLayerGNN(1, n_filters_per_bank, banks_order, graph_shift_operator)
+    elif task == 'multi_feature_graph_filter':
+        banks_order = [8, 1]
+        n_filters_per_bank = [32, 1]
+        filter_model = MultiLayerGNN(1,
+                                     n_filters_per_bank,
+                                     banks_order,
+                                     graph_shift_operator,
+                                     use_activation=False)
 
     optimizer = torch.optim.Adam(filter_model.parameters(), learning_rate)
     loss_function = torch.nn.MSELoss(reduction='mean')
@@ -34,12 +43,12 @@ def run(task, verbose=False):
     batch_loss_history = []
     validation_loss_history = []
     step = 0
-    for epoch in range(n_epochs):
+    for _ in range(n_epochs):
         for batch_idx in torch.split(torch.randperm(X_train.shape[0]), batch_size):
             X_batch = X_train[batch_idx]
             Y_batch = Y_train[batch_idx]
 
-            predicted = filter_model.forward(X_batch)
+            predicted = filter_model.forward(X_batch).squeeze()
             loss = loss_function(Y_batch, predicted)
 
             optimizer.zero_grad()
@@ -50,7 +59,7 @@ def run(task, verbose=False):
 
             step += 1
         with torch.no_grad():
-            predicted = filter_model.forward(X_validation)
+            predicted = filter_model.forward(X_validation).squeeze()
             validation_loss_history.append((step, loss_function(Y_validation, predicted).numpy()))
 
     if verbose:
@@ -63,7 +72,7 @@ def run(task, verbose=False):
         ax.legend()
 
     with torch.no_grad():
-        predicted = filter_model.forward(X_test)
+        predicted = filter_model.forward(X_test).squeeze()
         test_loss = loss_function(Y_test, predicted)
         if verbose:
             print(f'Test loss {test_loss}')
