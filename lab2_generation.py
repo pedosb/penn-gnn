@@ -93,10 +93,16 @@ def generate_dataset():
                                                             np.iinfo(np.int32).max),
                                                         shuffle=True)
 
-    return adjacency_matrix, X_train, X_test, Y_train, Y_test
+    validation_ration = 0.1
+    train_size = int(np.floor((1 - validation_ration) * X_train.shape[0]))
+    X_train, X_validation = np.split(X_train, [train_size])
+    Y_train, Y_validation = np.split(Y_train, [train_size])
+
+    return adjacency_matrix, X_train, X_test, X_validation, Y_train, Y_test, Y_validation
 
 
 # %%
 if __name__ == '__main__':
-    torch.save([torch.tensor(v, dtype=torch.float64) for v in generate_dataset()],
-               'lab2_dataset.pt')
+    for i in range(10):
+        torch.save([torch.tensor(v, dtype=torch.float64) for v in generate_dataset()],
+                   f'lab2_dataset_{i:02d}.pt')

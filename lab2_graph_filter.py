@@ -22,7 +22,7 @@ class GraphFilter(nn.Module):
         self.coefficients = nn.Parameter(torch.rand((order, n_features_in, n_filters)))
         self.reset_parameters()
         if use_activation:
-            self.activation = nn.LeakyReLU()
+            self.activation = nn.ReLU()
         else:
             self.activation = None
 
