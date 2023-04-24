@@ -14,8 +14,10 @@ experiments = {
     'My filter': lambda: lab2_graph_filter_train.run('graph_filter'),
     'My perceptron': lambda: lab2_graph_filter_train.run('graph_perceptron'),
     'My MLGNN': lambda: lab2_graph_filter_train.run('multilayer_gnn'),
-    'My Multi-feature graph filter':
+    'My multi-feature graph filter':
     lambda: lab2_graph_filter_train.run('multi_feature_graph_filter'),
+    'My multi-feature 2-layer GNN':
+    lambda: lab2_graph_filter_train.run('multi_feature_two_layer_gnn'),
 }
 
 n_experiments = 30

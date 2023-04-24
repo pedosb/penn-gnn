@@ -36,6 +36,14 @@ def run(task, verbose=False):
                                      banks_order,
                                      graph_shift_operator,
                                      use_activation=False)
+    elif task == 'multi_feature_two_layer_gnn':
+        banks_order = [8, 1]
+        n_filters_per_bank = [32, 1]
+        filter_model = MultiLayerGNN(1,
+                                     n_filters_per_bank,
+                                     banks_order,
+                                     graph_shift_operator,
+                                     use_activation=True)
 
     optimizer = torch.optim.Adam(filter_model.parameters(), learning_rate)
     loss_function = torch.nn.MSELoss(reduction='mean')
