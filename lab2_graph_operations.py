@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 from utils import random
 
@@ -12,7 +13,7 @@ def diffuse_signal(signal: np.ndarray, graph_shift_operator, n_diffusion_steps, 
     return diffused_signal
 
 
-def filter_graph_signal(filter_coefficients, graph_shift_operator, signal):
+def filter_graph_signal(filter_coefficients, graph_shift_operator, signal, bias=None):
     """Apply the graph filter
 
     Args:
@@ -24,8 +25,10 @@ def filter_graph_signal(filter_coefficients, graph_shift_operator, signal):
         tensor: n_samples x n_nodes x n_features_out
     """
     signal_step = signal
-    filtered_signal = signal_step @ filter_coefficients[0]
-    for coefficient in filter_coefficients[1:]:
+    if bias is None:
+        bias = torch.zeros(filter_coefficients.shape[0])
+    filtered_signal = (signal_step @ filter_coefficients[0]) + bias[0]
+    for coefficient, bias in zip(filter_coefficients[1:], bias[1:]):
         signal_step = (graph_shift_operator @ signal_step)
-        filtered_signal += signal_step @ coefficient
+        filtered_signal += (signal_step @ coefficient) + bias
     return filtered_signal
