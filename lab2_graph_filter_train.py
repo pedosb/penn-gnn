@@ -22,7 +22,7 @@ def run(graph_shift_operator,
         Y_validation,
         task,
         verbose=False,
-        save_fig=False,
+        save=False,
         show_summary=False):
     n_nodes = X_train.shape[1]
     squeeze_feature_dims = False
@@ -97,7 +97,7 @@ def run(graph_shift_operator,
             predicted = model.forward(X_validation).squeeze()
             validation_loss_history.append((step, loss_function(Y_validation, predicted).numpy()))
 
-    if save_fig or verbose:
+    if save or verbose:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
 
@@ -106,13 +106,16 @@ def run(graph_shift_operator,
         ax.plot(*np.array(validation_loss_history).T, label='Validation loss')
         ax.legend()
 
-        if save_fig:
+        if save:
             fig.savefig(f'figures/{task}.png')
 
         if verbose:
             plt.show()
 
         plt.close()
+
+    if save:
+        torch.save(model, f'models/{task}.pt')
 
     with torch.no_grad():
         predicted = model.forward(X_test).squeeze()

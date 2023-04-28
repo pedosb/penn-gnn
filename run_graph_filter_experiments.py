@@ -49,10 +49,10 @@ for name, experiment_args in experiments.items():
     result_sum = 0
     total_results = 0
     for _ in range(n_experiments):
-        for dataset_name in glob(r"lab2_dataset_*.pt"):
+        for dataset_name in glob(r"lab2_dataset_??.pt"):
             dataset_args = torch.load(dataset_name)
 
-            experiment_args['save_fig'] = total_results == 0
+            experiment_args['save'] = total_results == 0
             experiment_args['show_summary'] = total_results == 0
             result_sum += lab2_graph_filter_train.run(
                 *dataset_args,
