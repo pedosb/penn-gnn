@@ -59,8 +59,7 @@ def generate_source_localization_samples(n_nodes, n_samples, n_sources, source_v
 
 
 # %%
-def generate_dataset():
-    n_nodes = 50
+def generate_dataset(n_nodes):
     n_communities = 5
     intra_community_probability = 0.6
     inter_community_probability = 0.2
@@ -72,7 +71,7 @@ def generate_dataset():
 
     n_nodes = adjacency_matrix.shape[0]
     n_samples = 2100
-    n_sources = 10  # M
+    n_sources = int(n_nodes / n_communities)  # M
     source_value_min = 0  # a
     source_value_max = 10  # b
     signal = generate_source_localization_samples(n_nodes, n_samples, n_sources, source_value_min,
@@ -104,5 +103,9 @@ def generate_dataset():
 # %%
 if __name__ == '__main__':
     for i in range(10):
-        torch.save([torch.tensor(v, dtype=torch.float64) for v in generate_dataset()],
+        torch.save([torch.tensor(v, dtype=torch.float64) for v in generate_dataset(50)],
                    f'lab2_dataset_{i:02d}.pt')
+    torch.save([torch.tensor(v, dtype=torch.float64) for v in generate_dataset(500)],
+               'lab2_dataset_500_nodes.pt')
+    torch.save([torch.tensor(v, dtype=torch.float64) for v in generate_dataset(1000)],
+               'lab2_dataset_1000_nodes.pt')
