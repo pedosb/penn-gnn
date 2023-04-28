@@ -10,6 +10,9 @@ import lab2_graph_filter_train
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--experiments', nargs='+', help='Which experiments to run')
+parser.add_argument('--dataset-glob-pattern',
+                    default=r"lab2_dataset_??.pt",
+                    help='Run training on each of the matched datasets report the average result')
 args = parser.parse_args()
 
 experiments = {
@@ -49,7 +52,7 @@ for name, experiment_args in experiments.items():
     result_sum = 0
     total_results = 0
     for _ in range(n_experiments):
-        for dataset_name in glob(r"lab2_dataset_??.pt"):
+        for dataset_name in glob(args.dataset_glob_pattern):
             dataset_args = torch.load(dataset_name)
 
             experiment_args['save'] = total_results == 0
