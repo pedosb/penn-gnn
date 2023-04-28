@@ -2,7 +2,7 @@ import math
 import torch
 from torch import nn
 
-from lab2_graph_operations import filter
+from lab2_graph_operations import filter_graph_signal
 
 
 class GraphFilter(nn.Module):
@@ -31,7 +31,7 @@ class GraphFilter(nn.Module):
         self.coefficients.data.uniform_(-stdv, stdv)
 
     def forward(self, X):
-        filtered_signal = filter(self.coefficients, self.graph_shift_operator, X)
+        filtered_signal = filter_graph_signal(self.coefficients, self.graph_shift_operator, X)
         if self.activation is not None:
             return self.activation(filtered_signal)
         else:
@@ -57,3 +57,8 @@ class MultiLayerGNN(nn.Module):
 
     def forward(self, X):
         return self.layers(X)
+
+    def set_graph_shift_operator(self, new_graph_shift_operator):
+        for layer in self.layers:
+            if isinstance(layer, GraphFilter):
+                layer.graph_shift_operator = new_graph_shift_operator

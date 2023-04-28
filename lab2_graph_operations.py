@@ -12,7 +12,7 @@ def diffuse_signal(signal: np.ndarray, graph_shift_operator, n_diffusion_steps, 
     return diffused_signal
 
 
-def filter(filter_coefficients, graph_shift_operator, signal):
+def filter_graph_signal(filter_coefficients, graph_shift_operator, signal):
     """Apply the graph filter
 
     Args:
