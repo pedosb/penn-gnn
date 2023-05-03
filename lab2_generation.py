@@ -8,6 +8,12 @@ from lab2_graph_operations import diffuse_signal
 from utils import random
 
 
+def normalize(adjacency_matrix):
+    eigenvalues, _ = np.linalg.eig(adjacency_matrix)
+    adjacency_matrix /= np.abs(eigenvalues).max()
+    return adjacency_matrix
+
+
 # %%
 def generate_stochastic_block_model_graph(n_nodes,
                                           n_communities,
@@ -33,8 +39,7 @@ def generate_stochastic_block_model_graph(n_nodes,
                 is_link = random.uniform() < inter_community_probability
             adjacency_matrix[i, j] = adjacency_matrix[j, i] = 1 if is_link else 0
 
-    eigenvalues, _ = np.linalg.eig(adjacency_matrix)
-    adjacency_matrix /= np.abs(eigenvalues).max()
+    adjacency_matrix = normalize(adjacency_matrix)
 
     if plot_graph:
         g = nx.from_numpy_array(adjacency_matrix)
