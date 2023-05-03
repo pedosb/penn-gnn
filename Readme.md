@@ -2,6 +2,8 @@
 
 Labs from [Penn GNN course](https://gnn.seas.upenn.edu/)
 
+This assumes [`ml-100k.zip`](https://files.grouplens.org/datasets/movielens/ml-100k.zip) is downloaded under `data`. `curl -o data/ml-100k.zip https://files.grouplens.org/datasets/movielens/ml-100k.zip`.
+
 ## Questions
 
 1. I was expecting to hit performance wise Filter < GNN < multilayer GNN (MLGNN). But that did not happen. MLGNN could
