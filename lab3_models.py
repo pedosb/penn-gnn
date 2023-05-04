@@ -60,15 +60,15 @@ def run_experiment(target_movie,
                 save_prefix=save_prefix,
                 verbose=verbose)
 
-    test_loss, _, _ = evaluate_model_loss(model,
-                                          torch.nn.MSELoss(),
-                                          X_test,
-                                          Y_test,
-                                          X_train,
-                                          Y_train,
-                                          verbose=verbose)
+    test_loss, train_loss, _ = evaluate_model_loss(model,
+                                                   torch.nn.MSELoss(),
+                                                   X_test,
+                                                   Y_test,
+                                                   X_train,
+                                                   Y_train,
+                                                   verbose=verbose)
 
     if show_summary:
         summary(model)
 
-    return test_loss
+    return test_loss, train_loss

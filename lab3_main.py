@@ -39,4 +39,10 @@ for name, experiment_args in experiments.items():
                 *dataset_args,
                 **experiment_args,
             ))
-    print(f'{np.mean(results):.5f} - {name} -', ''.join([f'{v:.3f} ' for v in results]))
+    results = np.array(results)
+    print('Train')
+    print(f'{np.mean(results[:, 1]):.5f} - {name} -',
+          ''.join([f'{v:.3f} ' for v in results[:, 1]]))
+    print('Test')
+    print(f'{np.mean(results[:, 0]):.5f} - {name} -',
+          ''.join([f'{v:.3f} ' for v in results[:, 0]]))
