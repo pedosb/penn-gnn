@@ -85,9 +85,9 @@ def evaluate_model_loss(model,
 
         if verbose:
             print(f'Test loss {test_loss}')
-        if X_train is not None:
-            print(f'Train loss {train_loss}')
-        if X_validation is not None:
-            print(f'Validation loss {validation_loss}')
+            if X_train is not None:
+                print(f'Train loss {train_loss}')
+            if X_validation is not None:
+                print(f'Validation loss {validation_loss}')
 
     return test_loss, train_loss, validation_loss
