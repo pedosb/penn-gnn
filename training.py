@@ -53,7 +53,7 @@ def train_model(
         if save:
             fig.savefig(f'figures/{save_prefix}.png')
 
-        if verbose:
+        elif verbose:
             plt.show()
 
         plt.close()
