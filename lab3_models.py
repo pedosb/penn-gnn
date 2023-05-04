@@ -1,12 +1,8 @@
 # %%
-import numpy as np
 import torch
-from sklearn.model_selection import train_test_split
+from torchinfo import summary
 
-from lab2_graph_filter import GraphFilter, MultiLayerGNN
-from lab3_dataset import (create_samples_from_ratings, load_movie_dataset,
-                          remove_users_not_rating_movie, split_train_test_users)
-from lab3_similarity_graph import (compute_movie_similarity_graph, stratify_and_normalize)
+from lab2_graph_filter import MultiLayerGNN
 from training import evaluate_model_loss, train_model
 from utils import random
 
@@ -19,15 +15,16 @@ def make_estimate_single_movie_loss(movie_index):
     return lambda *y: mse(*y) / 2
 
 
-def run_experiment(adjacency_matrix,
-                   target_movie,
+def run_experiment(target_movie,
+                   adjacency_matrix,
                    X_train,
                    X_test,
                    Y_train,
                    Y_test,
                    task,
-                   save=False,
-                   verbose=False):
+                   save_prefix=None,
+                   verbose=False,
+                   show_summary=False):
     n_nodes = X_train.shape[1]
     squeeze_feature_dims = False
     learning_rate = 5e-2
@@ -60,21 +57,18 @@ def run_experiment(adjacency_matrix,
                 X_train,
                 Y_train,
                 loss_function,
-                save_prefix=task if save else None,
+                save_prefix=save_prefix,
                 verbose=verbose)
 
-    evaluate_model_loss(model, loss_function, X_test, Y_test, X_train, Y_train, verbose=verbose)
+    test_loss, _, _ = evaluate_model_loss(model,
+                                          torch.nn.MSELoss(),
+                                          X_test,
+                                          Y_test,
+                                          X_train,
+                                          Y_train,
+                                          verbose=verbose)
 
+    if show_summary:
+        summary(model)
 
-for i in range(1):
-    contact_index, adjacency_matrix, X_train, X_test, Y_train, Y_test = torch.load(
-        f'datasets/lab3_similarity_{i:02d}.pt')
-    run_experiment(adjacency_matrix,
-                   contact_index,
-                   X_train,
-                   X_test,
-                   Y_train,
-                   Y_test,
-                   task='graph_filter',
-                   save=False,
-                   verbose=True)
+    return test_loss
