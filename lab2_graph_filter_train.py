@@ -82,8 +82,8 @@ def run(graph_shift_operator,
     if show_summary:
         summary(model)
 
-    test_loss, _, _ = evaluate_model_loss(model, loss_function, X_test, Y_test, X_validation,
-                                          Y_validation, X_train, Y_train, verbose)
+    test_loss, _, _ = evaluate_model_loss(model, loss_function, X_test, Y_test, X_train, Y_train,
+                                          X_validation, Y_validation, verbose)
 
     return test_loss
 

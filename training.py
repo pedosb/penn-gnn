@@ -35,16 +35,19 @@ def train_model(
             batch_loss_history.append((step, loss.detach().numpy()))
 
             step += 1
-        with torch.no_grad():
-            predicted = model.forward(X_validation).squeeze()
-            validation_loss_history.append((step, loss_function(Y_validation, predicted).numpy()))
+        if X_validation is not None:
+            with torch.no_grad():
+                predicted = model.forward(X_validation).squeeze()
+                validation_loss_history.append((step, loss_function(Y_validation,
+                                                                    predicted).numpy()))
 
     if save or verbose:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
 
         ax.plot(*np.array(batch_loss_history).T, label='Batch loss')
-        ax.plot(*np.array(validation_loss_history).T, label='Validation loss')
+        if X_validation is not None:
+            ax.plot(*np.array(validation_loss_history).T, label='Validation loss')
         ax.legend()
 
         if save:
@@ -59,19 +62,32 @@ def train_model(
         torch.save(model, f'models/{save_prefix}.pt')
 
 
-def evaluate_model_loss(model, loss_function, X_test, Y_test, X_validation, Y_validation, X_train,
-                        Y_train, verbose):
+def evaluate_model_loss(model,
+                        loss_function,
+                        X_test,
+                        Y_test,
+                        X_train=None,
+                        Y_train=None,
+                        X_validation=None,
+                        Y_validation=None,
+                        verbose=False):
+    validation_loss = torch.nan
+    train_loss = torch.nan
     with torch.no_grad():
         predicted = model.forward(X_test).squeeze()
         test_loss = loss_function(Y_test, predicted)
-        predicted = model.forward(X_validation).squeeze()
-        validation_loss = loss_function(Y_validation, predicted)
-        predicted = model.forward(X_train).squeeze()
-        train_loss = loss_function(Y_train, predicted)
+        if X_validation is not None:
+            predicted = model.forward(X_validation).squeeze()
+            validation_loss = loss_function(Y_validation, predicted)
+        if X_train is not None:
+            predicted = model.forward(X_train).squeeze()
+            train_loss = loss_function(Y_train, predicted)
 
         if verbose:
             print(f'Test loss {test_loss}')
-            print(f'Validation loss {validation_loss}')
+        if X_train is not None:
             print(f'Train loss {train_loss}')
+        if X_validation is not None:
+            print(f'Validation loss {validation_loss}')
 
-    return test_loss, validation_loss, train_loss
+    return test_loss, train_loss, validation_loss
