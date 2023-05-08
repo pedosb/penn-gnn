@@ -15,11 +15,13 @@ def train_model(
     Y_validation=None,
     save_prefix=None,
     verbose=False,
+    use_best_state=False,
 ):
     save = save_prefix is not None
     batch_loss_history = []
     validation_loss_history = []
     step = 0
+    best_score = None
     for _ in range(n_epochs):
         for batch_idx in torch.split(torch.randperm(X_train.shape[0]), batch_size):
             X_batch = X_train[batch_idx]
@@ -40,6 +42,12 @@ def train_model(
                 predicted = model.forward(X_validation).squeeze(-1)
                 validation_loss_history.append((step, loss_function(Y_validation,
                                                                     predicted).numpy()))
+                if best_score is None or best_score > validation_loss_history[-1][-1]:
+                    best_score = validation_loss_history[-1][-1]
+                    best_state = model.state_dict()
+
+    if use_best_state:
+        model.load_state_dict(best_state)
 
     if save or verbose:
         fig = plt.figure()
