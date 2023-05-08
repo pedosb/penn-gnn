@@ -34,20 +34,23 @@ def run_experiment(target_movie,
     batch_size = 5
 
     if task == 'graph_filter':
-        banks_order = [5, 1]
-        n_filters_per_bank = [64, 1]
+        banks_order = [5]
+        n_filters_per_bank = [64]
+        n_features_out = 1
         model = MultiLayerGNN(1,
                               n_filters_per_bank,
                               banks_order,
+                              n_features_out,
                               adjacency_matrix,
                               use_activation=False,
                               use_bias=True)
     elif task == 'linear':
+        batch_size = 64
         squeeze_feature_dims = True
         model = torch.nn.Linear(n_nodes, n_nodes)
     elif task == 'fcnn':
         squeeze_feature_dims = True
-        model = torch.nn.Sequential(torch.nn.Linear(n_nodes, 64), torch.nn.LeakyReLU(),
+        model = torch.nn.Sequential(torch.nn.Linear(n_nodes, 64), torch.nn.ReLU(),
                                     torch.nn.Linear(64, n_nodes))
     elif task == 'gnn':
         banks_order = [5]
