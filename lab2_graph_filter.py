@@ -32,7 +32,7 @@ class GraphFilter(nn.Module):
             self.bias = torch.zeros((order, ))
         self.reset_parameters()
         if use_activation:
-            self.activation = nn.LeakyReLU()
+            self.activation = nn.ReLU()
         else:
             self.activation = None
 
@@ -57,6 +57,7 @@ class MultiLayerGNN(nn.Module):
                  n_features_in,
                  n_filters_per_bank,
                  banks_order,
+                 n_readout_features_out,
                  graph_shift_operator,
                  use_activation=True,
                  use_bias=False) -> None:
@@ -68,9 +69,10 @@ class MultiLayerGNN(nn.Module):
                             use_activation, use_bias))
             n_features_in = n_features_out
         self.layers = nn.Sequential(*filters)
+        self.readout = nn.Linear(n_filters_per_bank[-1], n_readout_features_out, bias=True)
 
     def forward(self, X):
-        return self.layers(X)
+        return self.readout(self.layers(X))
 
     def set_graph_shift_operator(self, new_graph_shift_operator):
         for layer in self.layers:
