@@ -1,7 +1,7 @@
 # Comments/results of Lab 2
 
 One observation is that for GNN, I had to use leaky RELU, the RELU was getting "stuck" with zero gradients for multiple
-training instances.
+training instances. When implementing lab 1 I saw a difference. It seems that this might be caused by using RELU at the output layer (the last one should be linear, this might be what mess the gradients).
 
 Those results are also very unstable and dependent on random numbers, the order which they are executed seems to matter
 a lot.
