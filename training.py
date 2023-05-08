@@ -4,7 +4,7 @@ import torch
 
 
 def train_model(
-    model,
+    model: torch.nn.Module,
     optimizer,
     n_epochs,
     batch_size,
@@ -25,7 +25,7 @@ def train_model(
             X_batch = X_train[batch_idx]
             Y_batch = Y_train[batch_idx]
 
-            predicted = model.forward(X_batch).squeeze()
+            predicted = model.forward(X_batch).squeeze(-1)
             loss = loss_function(Y_batch, predicted)
 
             optimizer.zero_grad()
@@ -37,7 +37,7 @@ def train_model(
             step += 1
         if X_validation is not None:
             with torch.no_grad():
-                predicted = model.forward(X_validation).squeeze()
+                predicted = model.forward(X_validation).squeeze(-1)
                 validation_loss_history.append((step, loss_function(Y_validation,
                                                                     predicted).numpy()))
 
@@ -74,13 +74,13 @@ def evaluate_model_loss(model,
     validation_loss = torch.nan
     train_loss = torch.nan
     with torch.no_grad():
-        predicted = model.forward(X_test).squeeze()
+        predicted = model.forward(X_test).squeeze(-1)
         test_loss = loss_function(Y_test, predicted)
         if X_validation is not None:
-            predicted = model.forward(X_validation).squeeze()
+            predicted = model.forward(X_validation).squeeze(-1)
             validation_loss = loss_function(Y_validation, predicted)
         if X_train is not None:
-            predicted = model.forward(X_train).squeeze()
+            predicted = model.forward(X_train).squeeze(-1)
             train_loss = loss_function(Y_train, predicted)
 
         if verbose:
