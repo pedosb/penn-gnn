@@ -11,15 +11,25 @@ parser.add_argument('--experiments', nargs='+', help='Which experiments to run')
 parser.add_argument('--dataset-glob-pattern',
                     default=r"datasets/lab3_similarity_??.pt",
                     help='Run training on each of the matched datasets report the average result')
+parser.add_argument('--show-model-summary', action='store_true')
 args = parser.parse_args()
 
 experiments = {
-    'Filter': {
-        'task': 'graph_filter'
-    },
     'Linear': {
         'task': 'linear'
     },
+    'FCNN': {
+        'task': 'fcnn'
+    },
+    'Filter': {
+        'task': 'graph_filter'
+    },
+    'GNN': {
+        'task': 'gnn'
+    },
+    '2-layers GNN': {
+        'task': '2l_gnn'
+    }
 }
 
 n_experiments = 1
@@ -34,7 +44,7 @@ for name, experiment_args in experiments.items():
 
             model_name = experiment_args['task']
             experiment_args['save_prefix'] = f'{model_name}_{len(results):02d}'
-            experiment_args['show_summary'] = len(results) == 0
+            experiment_args['show_summary'] = args.show_model_summary and len(results) == 0
             results.append(lab3_models.run_experiment(
                 *dataset_args,
                 **experiment_args,
