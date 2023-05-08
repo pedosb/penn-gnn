@@ -143,3 +143,33 @@ Train
 Test
 1.00640 - 2-layers GNN - 0.896 0.956 1.038 1.074 1.054 0.912 1.178 0.944
 ```
+
+## Transferability
+
+The at least 10 movie graph has 1152 nodes, the 50 has 410 and the 150 has 203.
+
+The lab results in the website are not consistent with mine. Their error decreases when the graph increases. The
+opposite of mine. Not sure why. Their 2-layers is also better than mine. Maybe this should be revised if I try
+regenerate these results with Pytorch Geometric.
+
+| Number of layers | Same size (203 nodes) | 2x (410 nodes)   | 5x (1152 nodes) |
+|:-----------------|:---------------------:|:----------------:|:---------------:|
+| 1                | 0.99791               | 0.99673 (-0.12%) | 0.99824 (0.03%) |
+| 2                | 1.01420               | 1.02128 (0.70%)  | 1.02845 (1.41%) |
+
+```txt
+$ git checkout lab3-up-to-3.5
+$ python lab3_main.py --experiments "GNN" "2-layers GNN" --dataset-glob-pattern "datasets/lab3_similarity_??_150_reviews.pt"
+Train
+0.99352 - GNN - 0.986 1.001 0.970 0.995 0.983 0.979 1.018 1.016
+Test
+0.99791 - GNN - 1.066 0.869 1.168 0.961 1.117 1.057 0.833 0.911
+0.99673 - 50_reviews - 1.066 0.858 1.170 0.961 1.117 1.057 0.833 0.911
+0.99824 - 10_reviews - 1.066 0.869 1.172 0.961 1.117 1.057 0.833 0.911
+Train
+0.97021 - 2-layers GNN - 0.976 0.945 0.957 0.960 0.953 0.969 0.982 1.020
+Test
+1.01420 - 2-layers GNN - 1.071 0.879 1.166 0.999 1.082 1.083 0.895 0.937
+1.02128 - 50_reviews - 1.080 0.892 1.185 0.984 1.114 1.099 0.888 0.927
+1.02845 - 10_reviews - 1.080 0.910 1.185 0.984 1.100 1.108 0.914 0.948
+```
