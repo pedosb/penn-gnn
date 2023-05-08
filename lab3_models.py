@@ -15,6 +15,10 @@ def make_estimate_single_movie_mse(movie_index):
     return lambda y, pred: mse(y[..., movie_index], pred[..., movie_index])
 
 
+def make_eval_loss(movie_index):
+    return lambda *y: torch.sqrt(make_estimate_single_movie_mse(movie_index)(*y))
+
+
 def run_experiment(target_movie,
                    adjacency_matrix,
                    X_train,
@@ -94,16 +98,15 @@ def run_experiment(target_movie,
                 save_prefix=save_prefix,
                 verbose=verbose)
 
-    test_loss, train_loss, _ = evaluate_model_loss(
-        model,
-        lambda *y: torch.sqrt(make_estimate_single_movie_mse(target_movie)(*y)),
-        X_test,
-        Y_test,
-        X_train,
-        Y_train,
-        X_validation,
-        Y_validation,
-        verbose=verbose)
+    test_loss, train_loss, _ = evaluate_model_loss(model,
+                                                   make_eval_loss(target_movie),
+                                                   X_test,
+                                                   Y_test,
+                                                   X_train,
+                                                   Y_train,
+                                                   X_validation,
+                                                   Y_validation,
+                                                   verbose=verbose)
 
     if show_summary:
         summary(model)
