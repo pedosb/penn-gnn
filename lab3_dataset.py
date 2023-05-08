@@ -8,7 +8,7 @@ from lab3_similarity_graph import (compute_movie_similarity_graph, stratify_and_
 from utils import random
 
 
-def load_movie_dataset():
+def load_movie_dataset(min_number_of_reviews):
     with zipfile.ZipFile('data/ml-100k.zip') as zipf:
         u_file = zipf.open('ml-100k/u.data')
         u_data = np.loadtxt(u_file, np.uint32, delimiter='\t', usecols=(0, 1, 2))
@@ -23,7 +23,7 @@ def load_movie_dataset():
 
     movie_ratings[u_data[:, 0] - 1, u_data[:, 1] - 1] = u_data[:, 2]
 
-    selected_movies_mask = np.sum(movie_ratings > 0, axis=0) >= 150
+    selected_movies_mask = np.sum(movie_ratings > 0, axis=0) >= min_number_of_reviews
     new_movie_ids = np.cumsum(selected_movies_mask) - 1
     new_movie_id_map = dict(
         zip(np.arange(n_movies)[selected_movies_mask], new_movie_ids[selected_movies_mask]))
@@ -43,7 +43,6 @@ def split_users(n_users, ratio_train=0.9, ratio_validation=0.09, n_sets=1):
         users_test = random_indexes[i]
         users_train, users_validation = train_test_split(np.setdiff1d(indexes, users_test),
                                                          test_size=n_validation)
-        print(n_users, n_users - n_validation - n_test, n_validation, n_test)
         yield users_train, users_validation, users_test
 
 
@@ -60,7 +59,12 @@ def create_samples_from_ratings(movie_ratings, target_movie):
     return X, Y
 
 
-def generate_dataset(users_train, users_validation, users_test, target_movie):
+def generate_dataset(movie_ratings,
+                     users_train,
+                     users_validation,
+                     users_test,
+                     target_movie,
+                     verbose=False):
     adjacency_matrix = compute_movie_similarity_graph(movie_ratings[users_train])
     if verbose:
         print(f'There are {adjacency_matrix.shape[0]} movies in the similarity graph')
@@ -89,19 +93,24 @@ def generate_dataset(users_train, users_validation, users_test, target_movie):
 
 
 if __name__ == '__main__':
-    verbose = False
-
     contact_index = 257
-    movie_ratings, movie_id_map_loading = load_movie_dataset()
-    contact_index = movie_id_map_loading[contact_index]
-    n_users = movie_ratings.shape[0]
+    n_users = load_movie_dataset(150)[0].shape[0]
 
     for i, (users_train, users_validation, users_test) in enumerate(
             split_users(n_users, ratio_train=.9, ratio_validation=0.09, n_sets=8)):
-        adjacency_matrix, X_train, X_test, X_validation, Y_train, Y_test, Y_validation = generate_dataset(
-            users_train, users_validation, users_test, contact_index)
+        for min_number_of_reviews in [10, 50, 150]:
+            movie_ratings, movie_id_map_loading = load_movie_dataset(min_number_of_reviews)
+            mapped_contact_index = movie_id_map_loading[contact_index]
 
-        torch.save([
-            contact_index, adjacency_matrix, X_train, X_test, X_validation, Y_train, Y_test,
-            Y_validation
-        ], f'datasets/lab3_similarity_{i:02d}.pt')
+            adjacency_matrix, X_train, X_test, X_validation, Y_train, Y_test, Y_validation = generate_dataset(
+                movie_ratings,
+                users_train,
+                users_validation,
+                users_test,
+                mapped_contact_index,
+                verbose=True)
+
+            torch.save([
+                mapped_contact_index, adjacency_matrix, X_train, X_test, X_validation, Y_train,
+                Y_test, Y_validation
+            ], f'datasets/lab3_similarity_{i:02d}_{min_number_of_reviews:02d}_reviews.pt')
