@@ -177,3 +177,35 @@ Test
 1.02128 - 50_reviews - 1.080 0.892 1.185 0.984 1.114 1.099 0.888 0.927
 1.02845 - 10_reviews - 1.080 0.910 1.185 0.984 1.100 1.108 0.914 0.948
 ```
+
+## Manual check
+
+I checked the estimations of the reference solution against mine. To check if the model was not just estimating the average. And it seems that both mine and the reference are not very good, they are close to average, the reference does not seems to go down to low-value labels.
+
+For the case below, a estimator that always estimates the average value would produce a MSE of 1.0348, while the GNN has MSE of 1.0323.
+
+```txt
+pred         label
+[3.90174161, 2.        ],
+[4.18058087, 4.        ],
+[3.91360401, 4.        ],
+[3.67834524, 5.        ],
+[3.74828212, 2.        ],
+[3.67508965, 4.        ],
+[3.82394793, 4.        ],
+[3.71462124, 4.        ],
+[3.59110503, 3.        ],
+[3.7404873 , 3.        ]
+```
+
+My GNN is always estimating the same value no matter the input :/. This seems to be highly sensible to hyper
+parameters. Changing learning rate, batch size and number of epochs, I could find examples that go closer to the
+reference material. And do not estimate always the same output. For the graph of the same size, results could be a bit
+better than predicting average for training, but not for test.
+
+Predicting always the average of the target variable yields:
+
+```txt
+avg test  - 0.98582 - 1.065 0.823 1.171 0.951 1.093 1.050 0.832 0.901
+avg train - 0.99350 - 1.068 0.830 1.171 0.978 1.101 1.059 0.839 0.901
+```
