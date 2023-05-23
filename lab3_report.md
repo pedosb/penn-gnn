@@ -152,6 +152,10 @@ The lab results in the website are not consistent with mine. Their error decreas
 opposite of mine. Not sure why. Their 2-layers is also better than mine. Maybe this should be revised if I try
 regenerate these results with Pytorch Geometric.
 
+Looking at the predictions, it seems like the GNN is most of the time just estimating the average of the target.
+Sometimes with a slightly higher value for labels that are large (like 5). Maybe I should check what the solution
+provided by the course is estimating.
+
 | Number of layers | Same size (203 nodes) | 2x (410 nodes)   | 5x (1152 nodes) |
 |:-----------------|:---------------------:|:----------------:|:---------------:|
 | 1                | 0.99791               | 0.99673 (-0.12%) | 0.99824 (0.03%) |
